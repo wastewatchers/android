@@ -11,6 +11,7 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
+import android.widget.TableLayout;
 import android.widget.TextView;
 
 import java.util.Arrays;
@@ -27,7 +28,6 @@ public class ViewProductActivity extends AppCompatActivity {
     String mWeight;
     List<String> mVendors;
     List<List<Pair<ColorDrawable, ColorDrawable>>> mAlternatives;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -112,6 +112,25 @@ public class ViewProductActivity extends AppCompatActivity {
 
         // set alternatives
         setAlternatives(0);
+
+        // make detail text interactable
+        final TextView detailView = findViewById(R.id.details);
+        final TableLayout detailContainer = findViewById(R.id.detailsContainer);
+        detailView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                String name = detailView.getText().toString();
+                name = name.substring(1, name.length());
+
+                if(detailContainer.getVisibility() == View.VISIBLE){
+                    detailContainer.setVisibility(View.GONE);
+                    detailView.setText("▼" + name);
+                }else{
+                    detailContainer.setVisibility(View.VISIBLE);
+                    detailView.setText("▲" + name);
+                }
+            }
+        });
     }
 
     private static int dp2px(int dp) {
