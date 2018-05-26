@@ -6,6 +6,12 @@
     android:layout_height="match_parent"
     tools:context=".AddActivity">
 
+    <LinearLayout
+        android:focusable="true"
+        android:focusableInTouchMode="true"
+        android:layout_width="0px"
+        android:layout_height="0px"></LinearLayout>
+
     <ScrollView
         android:layout_width="0dp"
         android:layout_height="0dp"
@@ -54,13 +60,16 @@
                     android:layout_height="match_parent"
                     android:orientation="vertical">
 
-                    <ImageView
-                        android:id="@+id/imageView"
+                    <ImageButton
+                        android:id="@+id/imageButton"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         app:srcCompat="@android:drawable/ic_menu_camera"
-                        tools:layout_editor_absoluteX="150dp"
-                        tools:layout_editor_absoluteY="107dp" />
+                        tools:layout_editor_absoluteX="142dp"
+                        tools:layout_editor_absoluteY="69dp"
+                        android:nextFocusUp="@id/button"
+                        android:nextFocusLeft="@id/button" />
+
                 </LinearLayout>
             </HorizontalScrollView>
 
@@ -179,6 +188,7 @@
                     android:layout_marginTop="8dp"
                     android:ems="10"
                     android:inputType="numberDecimal"
+                    android:text="0.0"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/textView7" />
