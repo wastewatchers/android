@@ -45,7 +45,7 @@
                 app:layout_constraintTop_toTopOf="parent" />
 
             <HorizontalScrollView
-                android:id="@+id/horizontalScrollView"
+                android:id="@+id/pictureScrollView"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="8dp"
@@ -56,19 +56,20 @@
                 app:layout_constraintTop_toBottomOf="@+id/textView3">
 
                 <LinearLayout
+                    android:id="@+id/pictureLayout"
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
-                    android:orientation="vertical">
+                    android:orientation="horizontal">
 
                     <ImageButton
-                        android:id="@+id/imageButton"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
+                        android:id="@+id/takePictureButton"
+                        android:layout_width="80dp"
+                        android:layout_height="80dp"
+                        android:nextFocusLeft="@id/button"
+                        android:nextFocusUp="@id/button"
                         app:srcCompat="@android:drawable/ic_menu_camera"
                         tools:layout_editor_absoluteX="142dp"
-                        tools:layout_editor_absoluteY="69dp"
-                        android:nextFocusUp="@id/button"
-                        android:nextFocusLeft="@id/button" />
+                        tools:layout_editor_absoluteY="69dp" />
 
                 </LinearLayout>
             </HorizontalScrollView>
@@ -202,7 +203,7 @@
                 android:layout_marginTop="8dp"
                 android:text="Vendor"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/horizontalScrollView" />
+                app:layout_constraintTop_toBottomOf="@+id/pictureScrollView" />
 
             <Spinner
                 android:id="@+id/spinner2"
