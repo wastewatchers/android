@@ -1,3 +1,16 @@
 <resources>
     <string name="app_name">Waste Watchers</string>
+    <string-array name="array_recyclable">
+        <item>recyclable</item>
+        <item>non recyclable</item>
+        <item>compostable</item>
+    </string-array>
+    <string-array name="array_plasticTypes">
+        <item>PP</item>
+        <item>PE</item>
+        <item>PET</item>
+        <item>PS</item>
+        <item>PVC</item>
+        <item>other</item>
+    </string-array>
 </resources>

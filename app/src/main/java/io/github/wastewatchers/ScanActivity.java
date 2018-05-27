@@ -28,7 +28,7 @@ public class ScanActivity extends AppCompatActivity {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        IntentResult result = IntentIntegrator.parseActivityResult(requestCode, resultCode, data);
+        final IntentResult result = IntentIntegrator.parseActivityResult(requestCode, resultCode, data);
         if(result != null) {
             if(result.getContents() == null) {
                 Toast.makeText(this, "Cancelled", Toast.LENGTH_LONG).show();
@@ -49,14 +49,18 @@ public class ScanActivity extends AppCompatActivity {
 
                             int count = Integer.parseInt(response);
 
+                            Intent intent = null;
                             if(count < getResources().getInteger(R.integer.minRatings))
                             {
-                                startActivity(new Intent(context, AddActivity.class));
+                                intent = new Intent(context, AddActivity.class);
                             }
                             else
                             {
                                 // start product view activity
                             }
+
+                            intent.putExtra("EAN", result.getContents());
+                            startActivity(intent);
                         }
                     }, new Response.ErrorListener() {
                     @Override
