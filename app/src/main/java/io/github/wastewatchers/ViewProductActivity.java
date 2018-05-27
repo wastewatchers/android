@@ -106,7 +106,7 @@ public class ViewProductActivity extends AppCompatActivity {
         mPlasticType = json.getString("plastic_type");
         mWeight = String.format("%f g", json.getDouble("average_weight"));
 
-        mVendors = Arrays.asList("NONE");
+        mVendors = Arrays.asList("Kaufland");
         mAlternatives = Arrays.asList(
                 Arrays.asList(
                         new Pair<>(new ColorDrawable(Color.MAGENTA), new ColorDrawable(Color.GREEN)),
@@ -249,30 +249,52 @@ public class ViewProductActivity extends AppCompatActivity {
 
         List<Pair<ColorDrawable, ColorDrawable>> alternatives = mAlternatives.get(index);
 
-        for (int i = 0; i < alternatives.size(); i++) {
-            Pair<ColorDrawable, ColorDrawable> alternative = alternatives.get(i);
+//        for (int i = 0; i < alternatives.size(); i++) {
+//            Pair<ColorDrawable, ColorDrawable> alternative = alternatives.get(i);
+//
+//            LinearLayout layout = new LinearLayout(this);
+//            layout.setOrientation(LinearLayout.VERTICAL);
+//            LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+//            if(i > 0)
+//                layoutParams.leftMargin = dp2px(8);
+//            layout.setLayoutParams(layoutParams);
+//
+//            ImageView img = new ImageView(this);
+//            LinearLayout.LayoutParams imgLayoutParams = new LinearLayout.LayoutParams(dp2px(100), dp2px(80));
+//            img.setImageDrawable(alternative.first);
+//            img.setLayoutParams(imgLayoutParams);
+//
+//            ImageView rating = new ImageView(this);
+//            LinearLayout.LayoutParams ratingLayoutParams = new LinearLayout.LayoutParams(dp2px(100), dp2px(10));
+//            rating.setImageDrawable(alternative.second);
+//            rating.setLayoutParams(ratingLayoutParams);
+//
+//            layout.addView(img);
+//            layout.addView(rating);
+//
+//            alternativesView.addView(layout);
+//        }
 
-            LinearLayout layout = new LinearLayout(this);
-            layout.setOrientation(LinearLayout.VERTICAL);
-            LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-            if(i > 0)
-                layoutParams.leftMargin = dp2px(8);
-            layout.setLayoutParams(layoutParams);
+        LinearLayout layout = new LinearLayout(this);
+        layout.setOrientation(LinearLayout.VERTICAL);
+        LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+//        if(i > 0)
+//            layoutParams.leftMargin = dp2px(8);
+        layout.setLayoutParams(layoutParams);
 
-            ImageView img = new ImageView(this);
-            LinearLayout.LayoutParams imgLayoutParams = new LinearLayout.LayoutParams(dp2px(100), dp2px(80));
-            img.setImageDrawable(alternative.first);
-            img.setLayoutParams(imgLayoutParams);
+        ImageView img = new ImageView(this);
+        LinearLayout.LayoutParams imgLayoutParams = new LinearLayout.LayoutParams(dp2px(100), dp2px(80));
+        img.setImageResource(R.drawable.photo5211112382225557698);
+        img.setLayoutParams(imgLayoutParams);
 
-            ImageView rating = new ImageView(this);
-            LinearLayout.LayoutParams ratingLayoutParams = new LinearLayout.LayoutParams(dp2px(100), dp2px(10));
-            rating.setImageDrawable(alternative.second);
-            rating.setLayoutParams(ratingLayoutParams);
+        ImageView rating = new ImageView(this);
+        LinearLayout.LayoutParams ratingLayoutParams = new LinearLayout.LayoutParams(dp2px(100), dp2px(10));
+        rating.setImageDrawable(new ColorDrawable(Color.GREEN));
+        rating.setLayoutParams(ratingLayoutParams);
 
-            layout.addView(img);
-            layout.addView(rating);
+        layout.addView(img);
+        layout.addView(rating);
 
-            alternativesView.addView(layout);
-        }
+        alternativesView.addView(layout);
     }
 }
