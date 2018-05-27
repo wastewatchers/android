@@ -222,11 +222,10 @@ public class AddActivity extends AppCompatActivity {
                     LinearLayout.LayoutParams.WRAP_CONTENT,
                     LinearLayout.LayoutParams.MATCH_PARENT
             );
+            newImageView.setLayoutParams(layoutParams);
 
             layoutParams.setMargins(0,0, 8, 0);
             mPictureLayout.addView(newImageView, mPictureLayout.getChildCount() - 1, layoutParams);
-
-
         }
 
     }

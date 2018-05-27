@@ -6,6 +6,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -47,6 +48,8 @@ public class ViewProductActivity extends AppCompatActivity {
     String mWeight;
     List<String> mVendors;
     List<List<Pair<ColorDrawable, ColorDrawable>>> mAlternatives;
+
+    LinearLayout mImageLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -165,14 +168,15 @@ public class ViewProductActivity extends AppCompatActivity {
         });
 
         // set images
+        mImageLayout = findViewById(R.id.images);
         setImages();
     }
 
     private void setImages() throws JSONException {
         RequestQueue queue = Volley.newRequestQueue(getBaseContext());
 
-        LinearLayout imageLayout = findViewById(R.id.images);
         for (int i = 0; i < mImages.length(); i++) {
+            final int index = i;
             String id = mImages.getString(i);
 
             String url = "http://" + getString(R.string.serverIP) + "/image/" + id;
@@ -183,7 +187,7 @@ public class ViewProductActivity extends AppCompatActivity {
                         public void onResponse(String response) {
                             Log.d("productview", "Response is: " + response);
 
-                            showImage(response);
+                            showImage(response, index);
                         }
                     }, new Response.ErrorListener() {
                 @Override
@@ -196,21 +200,24 @@ public class ViewProductActivity extends AppCompatActivity {
         }
     }
 
-    private void showImage(String response)
+    private void showImage(String response, int index)
     {
-//        InputStream is =
-//        Bitmap bmp = BitmapFactory.decodeStream();
-//
-//        ImageView img = new ImageView(this);
-//
-//        LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(dp2px(100), dp2px(80));
-//        if(i > 0)
-//            layoutParams.leftMargin = dp2px(8);
-//
-//        img.setImageDrawable(drawable);
-//        img.setLayoutParams(layoutParams);
-//
-//        imageLayout.addView(img);
+        byte[] data = response.getBytes();
+        Bitmap bmp = BitmapFactory.decodeByteArray(data, 0, data.length);
+
+        ImageView img = new ImageView(this);
+
+        LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.WRAP_CONTENT,
+                LinearLayout.LayoutParams.MATCH_PARENT
+        );
+        if(index > 0)
+            layoutParams.leftMargin = dp2px(8);
+
+        img.setImageBitmap(bmp);
+        img.setLayoutParams(layoutParams);
+
+        mImageLayout.addView(img, layoutParams);
     }
 
     private static int dp2px(int dp) {
