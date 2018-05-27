@@ -115,7 +115,7 @@ public class ViewProductActivity extends AppCompatActivity {
 
         // make detail text interactable
         final TextView detailView = findViewById(R.id.details);
-        final TableLayout detailContainer = findViewById(R.id.detailsContainer);
+        final TableLayout detailContainer = findViewById(R.id.detailsContainerView);
         detailView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

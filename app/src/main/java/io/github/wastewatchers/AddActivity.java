@@ -58,8 +58,6 @@ public class AddActivity extends AppCompatActivity {
 
     protected String mEan = "1234567890123";
 
-    protected final String IP = "10.42.0.1:8080";
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -114,7 +112,7 @@ public class AddActivity extends AppCompatActivity {
         mSubmitButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                String productUrl = "http://" + IP + "/product/" + mEan + "?" +
+                String productUrl = "http://" + getString(R.string.serverIP) + "/product/" + mEan + "?" +
                         "name=" + mProductNameEditText.getText() + "&" +
                         "manufacturer=" + mManufacturerEditText.getText();
 
@@ -134,7 +132,7 @@ public class AddActivity extends AppCompatActivity {
                 mQueue.add(productRequest);
                 //mQueue.
 
-                String ratingUrl = "http://" + IP + "/rating/" + mEan + "?" +
+                String ratingUrl = "http://" + getString(R.string.serverIP) + "/rating/" + mEan + "?" +
                         "uid=" + mUuid + "&" +
                         "grade=" + mGradeRatingBar.getNumStars() + "&" +
                         "vendor=" + mVendorEditText.getText() + "&" +
@@ -158,7 +156,7 @@ public class AddActivity extends AppCompatActivity {
                 mQueue.add(ratingRequest);
 
                 for(Bitmap bmp : pictures) {
-                    String pictuesUrl = "http://" + IP + "/product/" + mEan + "/image";
+                    String pictuesUrl = "http://" + getString(R.string.serverIP) + "/product/" + mEan + "/image";
                     ByteArrayOutputStream stream = new ByteArrayOutputStream();
                     bmp.compress(Bitmap.CompressFormat.JPEG, 70, stream);
                     final byte[] pictureData = stream.toByteArray();
@@ -192,7 +190,7 @@ public class AddActivity extends AppCompatActivity {
             }
         });
 
-        String ratingCountUrl = "http://" + IP + "/rating/" + mEan + "/count";
+        String ratingCountUrl = "http://" + getString(R.string.serverIP) + "/rating/" + mEan + "/count";
 
         StringRequest ratingCountRequest = new StringRequest(Request.Method.GET, ratingCountUrl,
                 new Response.Listener<String>() {
