@@ -17,9 +17,6 @@ import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
 
 public class ScanActivity extends AppCompatActivity {
-    private static int sMinRatings = 5;
-    private static String sServerIP = "10.42.0.1:8080";
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -39,7 +36,7 @@ public class ScanActivity extends AppCompatActivity {
                 Toast.makeText(this, "Scanned: " + result.getContents(), Toast.LENGTH_LONG).show();
 
                 RequestQueue queue = Volley.newRequestQueue(getBaseContext());
-                String url = "http://" + sServerIP + "/rating/" + result.getContents() + "/count";
+                String url = "http://" + getString(R.string.serverIP) + "/rating/" + result.getContents() + "/count";
                 Log.d("scan", "url: " + url);
 
                 final Context context = this;
@@ -52,7 +49,7 @@ public class ScanActivity extends AppCompatActivity {
 
                             int count = Integer.parseInt(response);
 
-                            if(count < sMinRatings)
+                            if(count < getResources().getInteger(R.integer.minRatings))
                             {
                                 startActivity(new Intent(context, AddActivity.class));
                             }
