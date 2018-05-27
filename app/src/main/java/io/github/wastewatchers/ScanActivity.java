@@ -28,7 +28,9 @@ public class ScanActivity extends AppCompatActivity {
                 Toast.makeText(this, "Cancelled", Toast.LENGTH_LONG).show();
             } else {
                 Toast.makeText(this, "Scanned: " + result.getContents(), Toast.LENGTH_LONG).show();
-                startActivity(new Intent(this, AddActivity.class));
+                Intent intent = new Intent(this, AddActivity.class);
+                intent.putExtra("EAN", result.getContents());
+                startActivity(intent);
             }
         } else {
             super.onActivityResult(requestCode, resultCode, data);
