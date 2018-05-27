@@ -13,8 +13,11 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RatingBar;
+import android.widget.Spinner;
 import android.widget.TextView;
 
+import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
@@ -22,11 +25,17 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 
+import java.io.ByteArrayOutputStream;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
+
 public class AddActivity extends AppCompatActivity {
 
     static final String TAG = "AddActivity";
     static final int REQUEST_IMAGE_CAPTURE = 1;
     static float dpScale;
+
 
     protected ImageButton mTakePictureButton;
     protected LinearLayout mPictureLayout;
@@ -35,6 +44,17 @@ public class AddActivity extends AppCompatActivity {
     protected Button mSubmitButton;
     protected EditText mProductNameEditText;
     protected EditText mManufacturerEditText;
+    protected RatingBar mGradeRatingBar;
+    protected EditText mVendorEditText;
+    protected Spinner mPlasticTypeSpinner;
+    protected EditText mWeightEditText;
+    protected Spinner mRecyclableSpinner;
+
+    protected List<Bitmap> pictures = new ArrayList<>();
+
+    protected RequestQueue mQueue;
+
+    protected String mUuid;
 
     protected String mEan = "1234567890123";
 
@@ -46,6 +66,8 @@ public class AddActivity extends AppCompatActivity {
         setContentView(R.layout.activity_add);
 
         mEan = getIntent().getStringExtra("EAN");
+        mQueue = Volley.newRequestQueue(getBaseContext());
+        mUuid = UUID.randomUUID().toString();
 
         dpScale = getResources().getDisplayMetrics().density;
 
@@ -53,6 +75,11 @@ public class AddActivity extends AppCompatActivity {
         mDetailsContainer = findViewById(R.id.detailsContainer);
         mProductNameEditText = findViewById(R.id.productNameEditText);
         mManufacturerEditText = findViewById(R.id.manufacturerEditText);
+        mGradeRatingBar = findViewById(R.id.gradeRatingBar);
+        mVendorEditText = findViewById(R.id.vendorEditText);
+        mPlasticTypeSpinner = findViewById(R.id.plasticTypeSpinner);
+        mWeightEditText = findViewById(R.id.weightEditText);
+        mRecyclableSpinner = findViewById(R.id.recyclableSpinner);
 
         mTakePictureButton = findViewById(R.id.takePictureButton);
         mTakePictureButton.setOnClickListener(new View.OnClickListener() {
@@ -87,12 +114,34 @@ public class AddActivity extends AppCompatActivity {
         mSubmitButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                RequestQueue queue = Volley.newRequestQueue(getBaseContext());
-                String url = "http://" + IP + "/product/" + mEan + "?" +
+                String productUrl = "http://" + IP + "/product/" + mEan + "?" +
                         "name=" + mProductNameEditText.getText() + "&" +
                         "manufacturer=" + mManufacturerEditText.getText();
 
-                StringRequest stringRequest = new StringRequest(Request.Method.PUT, url,
+                StringRequest productRequest = new StringRequest(Request.Method.PUT, productUrl,
+                        new Response.Listener<String>() {
+                            @Override
+                            public void onResponse(String response) {
+                                Log.d(TAG, "Response is: " + response);
+                            }
+                        }, new Response.ErrorListener() {
+                            @Override
+                            public void onErrorResponse(VolleyError error) {
+                                Log.d(TAG, "That didn't work: " + error);
+                            }
+                });
+
+                mQueue.add(productRequest);
+
+                String ratingUrl = "http://" + IP + "/rating/" + mEan + "?" +
+                        "uid=" + mUuid + "&" +
+                        "grade=" + mGradeRatingBar.getNumStars() + "&" +
+                        "vendor=" + mVendorEditText.getText() + "&" +
+                        "ptype=" + mPlasticTypeSpinner.getSelectedItem().toString() + "&" +
+                        "weight=" + mWeightEditText.getText() + "&" +
+                        "recyclable=" + mRecyclableSpinner.getSelectedItem().toString().replace(' ', '_');
+
+                StringRequest ratingRequest = new StringRequest(Request.Method.PUT, ratingUrl,
                         new Response.Listener<String>() {
                             @Override
                             public void onResponse(String response) {
@@ -105,7 +154,40 @@ public class AddActivity extends AppCompatActivity {
                     }
                 });
 
-                queue.add(stringRequest);/**/
+                mQueue.add(ratingRequest);
+
+                for(Bitmap bmp : pictures) {
+                    String pictuesUrl = "http://" + IP + "/product/" + mEan + "/image";
+                    ByteArrayOutputStream stream = new ByteArrayOutputStream();
+                    bmp.compress(Bitmap.CompressFormat.JPEG, 70, stream);
+                    final byte[] pictureData = stream.toByteArray();
+
+                    StringRequest pictureRequest = new StringRequest(Request.Method.PUT, pictuesUrl,
+                            new Response.Listener<String>() {
+                                @Override
+                                public void onResponse(String response) {
+                                    Log.d(TAG, "Response is: " + response);
+                                }
+                            }, new Response.ErrorListener() {
+                        @Override
+                        public void onErrorResponse(VolleyError error) {
+                            Log.d(TAG, "That didn't work: " + error);
+                        }
+                    }) {
+                        @Override
+                        public String getBodyContentType() {
+                            //TODO: change type
+                            return "image/jpeg";
+                        }
+
+                        @Override
+                        public byte[] getBody(){
+                            return pictureData;
+                        }
+                    };
+
+                    mQueue.add(pictureRequest);
+                }
             }
         });
     }
@@ -116,7 +198,7 @@ public class AddActivity extends AppCompatActivity {
         if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
             Bundle extras = data.getExtras();
             Bitmap imageBitmap = (Bitmap) extras.get("data");
-
+            pictures.add(imageBitmap);
 
             ImageView newImageView = new ImageView(this);
             newImageView.setImageBitmap(imageBitmap);

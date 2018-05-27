@@ -5,4 +5,12 @@
         <item>not recyclable</item>
         <item>compostable</item>
     </string-array>
+    <string-array name="array_plasticTypes">
+        <item>PP</item>
+        <item>PE</item>
+        <item>PET</item>
+        <item>PS</item>
+        <item>PVC</item>
+        <item>other</item>
+    </string-array>
 </resources>
