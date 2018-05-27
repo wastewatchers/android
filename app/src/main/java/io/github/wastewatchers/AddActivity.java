@@ -26,6 +26,7 @@ import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 
 import java.io.ByteArrayOutputStream;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -113,8 +114,8 @@ public class AddActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 String productUrl = "http://" + getString(R.string.serverIP) + "/product/" + mEan + "?" +
-                        "name=" + mProductNameEditText.getText() + "&" +
-                        "manufacturer=" + mManufacturerEditText.getText();
+                        "name=" + mProductNameEditText.getText().toString().replace(" ", "%20") + "&" +
+                        "manufacturer=" + mManufacturerEditText.getText().toString().replace(" ", "%20");
 
                 StringRequest productRequest = new StringRequest(Request.Method.PUT, productUrl,
                         new Response.Listener<String>() {
@@ -135,7 +136,7 @@ public class AddActivity extends AppCompatActivity {
                 String ratingUrl = "http://" + getString(R.string.serverIP) + "/rating/" + mEan + "?" +
                         "uid=" + mUuid + "&" +
                         "grade=" + mGradeRatingBar.getNumStars() + "&" +
-                        "vendor=" + mVendorEditText.getText() + "&" +
+                        "vendor=" + mVendorEditText.getText().toString().replace(" ", "%20") + "&" +
                         "ptype=" + mPlasticTypeSpinner.getSelectedItem().toString() + "&" +
                         "weight=" + mWeightEditText.getText() + "&" +
                         "recyclable=" + mRecyclableSpinner.getSelectedItem().toString().replace(' ', '_');
@@ -187,6 +188,10 @@ public class AddActivity extends AppCompatActivity {
 
                     mQueue.add(pictureRequest);
                 }
+
+                Intent intent = new Intent(getBaseContext(), ViewProductActivity.class);
+                intent.putExtra("EAN", mEan);
+                startActivity(intent);
             }
         });
 
