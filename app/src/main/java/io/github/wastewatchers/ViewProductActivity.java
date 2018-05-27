@@ -2,6 +2,8 @@ package io.github.wastewatchers;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
@@ -24,9 +26,12 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.Arrays;
 import java.util.List;
 
@@ -34,7 +39,7 @@ public class ViewProductActivity extends AppCompatActivity {
     static float dpScale;
 
     String mEan;
-    List<ColorDrawable> mImages;
+    JSONArray mImages;
     ColorDrawable mRating;
     String mName;
     String mRecycleable;
@@ -57,7 +62,7 @@ public class ViewProductActivity extends AppCompatActivity {
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
-                        Log.d("scan", "Response is: " + response);
+                        Log.d("productview", "Response is: " + response);
 
                         try {
                             showRatings(response);
@@ -78,11 +83,7 @@ public class ViewProductActivity extends AppCompatActivity {
     private void showRatings(String response) throws JSONException {
         JSONObject json = new JSONObject(response);
 
-        mImages = Arrays.asList(
-                new ColorDrawable(Color.BLUE),
-                new ColorDrawable(Color.GREEN),
-                new ColorDrawable(Color.YELLOW),
-                new ColorDrawable(Color.RED));
+        mImages = json.getJSONArray("images");
 
         double rating = json.getDouble("average_grade");
         mRating = new ColorDrawable(rating < 1.5 ? Color.RED : rating < 2.5 ? Color.YELLOW : Color.GREEN);
@@ -113,22 +114,6 @@ public class ViewProductActivity extends AppCompatActivity {
                         new Pair<>(new ColorDrawable(Color.DKGRAY), new ColorDrawable(Color.YELLOW))
                 )
         );
-
-        // set images
-        LinearLayout imageLayout = findViewById(R.id.images);
-        for (int i = 0; i < mImages.size(); i++) {
-            ColorDrawable drawable = mImages.get(i);
-            ImageView img = new ImageView(this);
-
-            LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(dp2px(100), dp2px(80));
-            if(i > 0)
-                layoutParams.leftMargin = dp2px(8);
-
-            img.setImageDrawable(drawable);
-            img.setLayoutParams(layoutParams);
-
-            imageLayout.addView(img);
-        }
 
         // set rating
         ImageView ratingView = findViewById(R.id.ratingBar);
@@ -178,6 +163,54 @@ public class ViewProductActivity extends AppCompatActivity {
                 }
             }
         });
+
+        // set images
+        setImages();
+    }
+
+    private void setImages() throws JSONException {
+        RequestQueue queue = Volley.newRequestQueue(getBaseContext());
+
+        LinearLayout imageLayout = findViewById(R.id.images);
+        for (int i = 0; i < mImages.length(); i++) {
+            String id = mImages.getString(i);
+
+            String url = "http://" + getString(R.string.serverIP) + "/image/" + id;
+
+            StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
+                    new Response.Listener<String>() {
+                        @Override
+                        public void onResponse(String response) {
+                            Log.d("productview", "Response is: " + response);
+
+                            showImage(response);
+                        }
+                    }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    Log.d("scan", "That didn't work: " + error);
+                }
+            });
+
+            queue.add(stringRequest);
+        }
+    }
+
+    private void showImage(String response)
+    {
+//        InputStream is =
+//        Bitmap bmp = BitmapFactory.decodeStream();
+//
+//        ImageView img = new ImageView(this);
+//
+//        LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(dp2px(100), dp2px(80));
+//        if(i > 0)
+//            layoutParams.leftMargin = dp2px(8);
+//
+//        img.setImageDrawable(drawable);
+//        img.setLayoutParams(layoutParams);
+//
+//        imageLayout.addView(img);
     }
 
     private static int dp2px(int dp) {
