@@ -15,7 +15,7 @@
     <ScrollView
         android:layout_width="0dp"
         android:layout_height="0dp"
-        app:layout_constraintBottom_toTopOf="@+id/button"
+        app:layout_constraintBottom_toTopOf="@+id/submitButton"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"
@@ -65,8 +65,8 @@
                         android:id="@+id/takePictureButton"
                         android:layout_width="80dp"
                         android:layout_height="80dp"
-                        android:nextFocusLeft="@id/button"
-                        android:nextFocusUp="@id/button"
+                        android:nextFocusLeft="@id/submitButton"
+                        android:nextFocusUp="@id/submitButton"
                         app:srcCompat="@android:drawable/ic_menu_camera"
                         tools:layout_editor_absoluteX="142dp"
                         tools:layout_editor_absoluteY="69dp" />
@@ -115,7 +115,7 @@
                 android:layout_marginTop="8dp"
                 android:text="how environmentally friendly is the packaging"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/spinner2" />
+                app:layout_constraintTop_toBottomOf="@+id/vendorEditText" />
 
             <RatingBar
                 android:id="@+id/ratingBar"
@@ -208,7 +208,7 @@
                 app:layout_constraintTop_toBottomOf="@+id/spinner3" />
 
             <Spinner
-                android:id="@+id/spinner2"
+                android:id="@+id/vendorSpinner"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="8dp"
@@ -226,7 +226,7 @@
                 android:layout_marginTop="8dp"
                 android:text="Recyclable"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/editText" />
+                app:layout_constraintTop_toBottomOf="@+id/editText4" />
 
             <Spinner
                 android:id="@+id/spinner3"
@@ -240,11 +240,49 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/textView5" />
 
+            <EditText
+                android:id="@+id/vendorEditText"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="8dp"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="8dp"
+                android:ems="10"
+                android:inputType="textPersonName"
+                android:text="Name"
+                android:visibility="gone"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/vendorSpinner" />
+
+            <TextView
+                android:id="@+id/textView9"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="8dp"
+                android:text="Manufacturer"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/editText" />
+
+            <EditText
+                android:id="@+id/editText4"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="8dp"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="8dp"
+                android:ems="10"
+                android:inputType="textPersonName"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/textView9" />
+
         </android.support.constraint.ConstraintLayout>
     </ScrollView>
 
     <Button
-        android:id="@+id/button"
+        android:id="@+id/submitButton"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:text="Submit"
