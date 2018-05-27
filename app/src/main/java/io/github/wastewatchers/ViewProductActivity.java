@@ -7,7 +7,9 @@ import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
+import android.media.Image;
 import android.os.Bundle;
+import android.os.Environment;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.util.Pair;
@@ -24,6 +26,7 @@ import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
+import com.android.volley.toolbox.ImageRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 
@@ -31,8 +34,15 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
+import java.nio.ByteBuffer;
+import java.nio.CharBuffer;
 import java.util.Arrays;
 import java.util.List;
 
@@ -177,34 +187,31 @@ public class ViewProductActivity extends AppCompatActivity {
 
         for (int i = 0; i < mImages.length(); i++) {
             final int index = i;
-            String id = mImages.getString(i);
+            final String id = mImages.getString(i);
 
             String url = "http://" + getString(R.string.serverIP) + "/image/" + id;
 
-            StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
-                    new Response.Listener<String>() {
-                        @Override
-                        public void onResponse(String response) {
-                            Log.d("productview", "Response is: " + response);
+            ImageRequest imageRequest = new ImageRequest(url,
+                    new Response.Listener<Bitmap>() {
+                @Override
+                public void onResponse(Bitmap response) {
+                    Log.d("productview", "GET IMAGE: " + id);
 
-                            showImage(response, index);
-                        }
-                    }, new Response.ErrorListener() {
+                    showImage(response, index);
+                }
+            }, 0, 0, null, new Response.ErrorListener() {
                 @Override
                 public void onErrorResponse(VolleyError error) {
                     Log.d("scan", "That didn't work: " + error);
                 }
             });
 
-            queue.add(stringRequest);
+            queue.add(imageRequest);
         }
     }
 
-    private void showImage(String response, int index)
+    private void showImage(Bitmap response, int index)
     {
-        byte[] data = response.getBytes();
-        Bitmap bmp = BitmapFactory.decodeByteArray(data, 0, data.length);
-
         ImageView img = new ImageView(this);
 
         LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
@@ -214,10 +221,10 @@ public class ViewProductActivity extends AppCompatActivity {
         if(index > 0)
             layoutParams.leftMargin = dp2px(8);
 
-        img.setImageBitmap(bmp);
+        img.setImageBitmap(response);
         img.setLayoutParams(layoutParams);
 
-        mImageLayout.addView(img, layoutParams);
+        mImageLayout.addView(img);
     }
 
     private static int dp2px(int dp) {
