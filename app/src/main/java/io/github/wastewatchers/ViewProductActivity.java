@@ -1,9 +1,12 @@
 package io.github.wastewatchers;
 
+import android.content.Context;
+import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.util.Pair;
 import android.view.View;
 import android.widget.AdapterView;
@@ -14,12 +17,23 @@ import android.widget.Spinner;
 import android.widget.TableLayout;
 import android.widget.TextView;
 
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.Arrays;
 import java.util.List;
 
 public class ViewProductActivity extends AppCompatActivity {
     static float dpScale;
 
+    String mEan;
     List<ColorDrawable> mImages;
     ColorDrawable mRating;
     String mName;
@@ -34,37 +48,70 @@ public class ViewProductActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_view_product);
         dpScale = getResources().getDisplayMetrics().density;
+        mEan = getIntent().getStringExtra("EAN");
+
+        RequestQueue queue = Volley.newRequestQueue(getBaseContext());
+        String url = "http://" + getString(R.string.serverIP) + "/rating/" + mEan + "/summary";
+
+        StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        Log.d("scan", "Response is: " + response);
+
+                        try {
+                            showRatings(response);
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Log.d("scan", "That didn't work: " + error);
+            }
+        });
+
+        queue.add(stringRequest);
+    }
+
+    private void showRatings(String response) throws JSONException {
+        JSONObject json = new JSONObject(response);
 
         mImages = Arrays.asList(
-            new ColorDrawable(Color.BLUE),
-            new ColorDrawable(Color.GREEN),
-            new ColorDrawable(Color.YELLOW),
-            new ColorDrawable(Color.RED));
-        mRating = new ColorDrawable(Color.GREEN);
-        mName = "IT'S TRASH";
-        mRecycleable = "HELL YEAH BROTHA";
-        mPlasticType = "YES";
-        mWeight = "A METRIC SHITTON";
-        mVendors = Arrays.asList("HERE", "THERE", "SOMEWHERE ELSE");
+                new ColorDrawable(Color.BLUE),
+                new ColorDrawable(Color.GREEN),
+                new ColorDrawable(Color.YELLOW),
+                new ColorDrawable(Color.RED));
+
+        double rating = json.getDouble("average_grade");
+        mRating = new ColorDrawable(rating < 1.5 ? Color.RED : rating < 2.5 ? Color.YELLOW : Color.GREEN);
+
+        mName = json.getString("name");
+        mRecycleable = json.getString("recyclable");
+        mPlasticType = json.getString("plastic_type");
+        mWeight = String.format("%f g", json.getDouble("average_weight"));
+
+        mVendors = Arrays.asList("NONE");
         mAlternatives = Arrays.asList(
-            Arrays.asList(
-                new Pair<>(new ColorDrawable(Color.MAGENTA), new ColorDrawable(Color.GREEN)),
-                new Pair<>(new ColorDrawable(Color.MAGENTA), new ColorDrawable(Color.YELLOW)),
-                new Pair<>(new ColorDrawable(Color.MAGENTA), new ColorDrawable(Color.RED)),
-                new Pair<>(new ColorDrawable(Color.MAGENTA), new ColorDrawable(Color.RED))
-            ),
-            Arrays.asList(
-                new Pair<>(new ColorDrawable(Color.CYAN), new ColorDrawable(Color.GREEN)),
-                new Pair<>(new ColorDrawable(Color.CYAN), new ColorDrawable(Color.YELLOW)),
-                new Pair<>(new ColorDrawable(Color.CYAN), new ColorDrawable(Color.YELLOW)),
-                new Pair<>(new ColorDrawable(Color.CYAN), new ColorDrawable(Color.RED))
-            ),
-            Arrays.asList(
-                new Pair<>(new ColorDrawable(Color.DKGRAY), new ColorDrawable(Color.GREEN)),
-                new Pair<>(new ColorDrawable(Color.DKGRAY), new ColorDrawable(Color.GREEN)),
-                new Pair<>(new ColorDrawable(Color.DKGRAY), new ColorDrawable(Color.GREEN)),
-                new Pair<>(new ColorDrawable(Color.DKGRAY), new ColorDrawable(Color.YELLOW))
-            )
+                Arrays.asList(
+                        new Pair<>(new ColorDrawable(Color.MAGENTA), new ColorDrawable(Color.GREEN)),
+                        new Pair<>(new ColorDrawable(Color.MAGENTA), new ColorDrawable(Color.YELLOW)),
+                        new Pair<>(new ColorDrawable(Color.MAGENTA), new ColorDrawable(Color.RED)),
+                        new Pair<>(new ColorDrawable(Color.MAGENTA), new ColorDrawable(Color.RED))
+                ),
+                Arrays.asList(
+                        new Pair<>(new ColorDrawable(Color.CYAN), new ColorDrawable(Color.GREEN)),
+                        new Pair<>(new ColorDrawable(Color.CYAN), new ColorDrawable(Color.YELLOW)),
+                        new Pair<>(new ColorDrawable(Color.CYAN), new ColorDrawable(Color.YELLOW)),
+                        new Pair<>(new ColorDrawable(Color.CYAN), new ColorDrawable(Color.RED))
+                ),
+                Arrays.asList(
+                        new Pair<>(new ColorDrawable(Color.DKGRAY), new ColorDrawable(Color.GREEN)),
+                        new Pair<>(new ColorDrawable(Color.DKGRAY), new ColorDrawable(Color.GREEN)),
+                        new Pair<>(new ColorDrawable(Color.DKGRAY), new ColorDrawable(Color.GREEN)),
+                        new Pair<>(new ColorDrawable(Color.DKGRAY), new ColorDrawable(Color.YELLOW))
+                )
         );
 
         // set images
