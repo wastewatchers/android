@@ -1,9 +1,15 @@
 package io.github.wastewatchers;
 
+import android.content.Context;
+import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.util.Pair;
 import android.view.View;
 import android.widget.AdapterView;
@@ -14,13 +20,27 @@ import android.widget.Spinner;
 import android.widget.TableLayout;
 import android.widget.TextView;
 
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.Arrays;
 import java.util.List;
 
 public class ViewProductActivity extends AppCompatActivity {
     static float dpScale;
 
-    List<ColorDrawable> mImages;
+    String mEan;
+    JSONArray mImages;
     ColorDrawable mRating;
     String mName;
     String mRecycleable;
@@ -29,59 +49,74 @@ public class ViewProductActivity extends AppCompatActivity {
     List<String> mVendors;
     List<List<Pair<ColorDrawable, ColorDrawable>>> mAlternatives;
 
+    LinearLayout mImageLayout;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_view_product);
         dpScale = getResources().getDisplayMetrics().density;
+        mEan = getIntent().getStringExtra("EAN");
 
-        mImages = Arrays.asList(
-            new ColorDrawable(Color.BLUE),
-            new ColorDrawable(Color.GREEN),
-            new ColorDrawable(Color.YELLOW),
-            new ColorDrawable(Color.RED));
-        mRating = new ColorDrawable(Color.GREEN);
-        mName = "IT'S TRASH";
-        mRecycleable = "HELL YEAH BROTHA";
-        mPlasticType = "YES";
-        mWeight = "A METRIC SHITTON";
-        mVendors = Arrays.asList("HERE", "THERE", "SOMEWHERE ELSE");
+        RequestQueue queue = Volley.newRequestQueue(getBaseContext());
+        String url = "http://" + getString(R.string.serverIP) + "/rating/" + mEan + "/summary";
+
+        StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        Log.d("productview", "Response is: " + response);
+
+                        try {
+                            showRatings(response);
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Log.d("scan", "That didn't work: " + error);
+            }
+        });
+
+        queue.add(stringRequest);
+    }
+
+    private void showRatings(String response) throws JSONException {
+        JSONObject json = new JSONObject(response);
+
+        mImages = json.getJSONArray("images");
+
+        double rating = json.getDouble("average_grade");
+        mRating = new ColorDrawable(rating < 1.5 ? Color.RED : rating < 2.5 ? Color.YELLOW : Color.GREEN);
+
+        mName = json.getString("name");
+        mRecycleable = json.getString("recyclable");
+        mPlasticType = json.getString("plastic_type");
+        mWeight = String.format("%f g", json.getDouble("average_weight"));
+
+        mVendors = Arrays.asList("NONE");
         mAlternatives = Arrays.asList(
-            Arrays.asList(
-                new Pair<>(new ColorDrawable(Color.MAGENTA), new ColorDrawable(Color.GREEN)),
-                new Pair<>(new ColorDrawable(Color.MAGENTA), new ColorDrawable(Color.YELLOW)),
-                new Pair<>(new ColorDrawable(Color.MAGENTA), new ColorDrawable(Color.RED)),
-                new Pair<>(new ColorDrawable(Color.MAGENTA), new ColorDrawable(Color.RED))
-            ),
-            Arrays.asList(
-                new Pair<>(new ColorDrawable(Color.CYAN), new ColorDrawable(Color.GREEN)),
-                new Pair<>(new ColorDrawable(Color.CYAN), new ColorDrawable(Color.YELLOW)),
-                new Pair<>(new ColorDrawable(Color.CYAN), new ColorDrawable(Color.YELLOW)),
-                new Pair<>(new ColorDrawable(Color.CYAN), new ColorDrawable(Color.RED))
-            ),
-            Arrays.asList(
-                new Pair<>(new ColorDrawable(Color.DKGRAY), new ColorDrawable(Color.GREEN)),
-                new Pair<>(new ColorDrawable(Color.DKGRAY), new ColorDrawable(Color.GREEN)),
-                new Pair<>(new ColorDrawable(Color.DKGRAY), new ColorDrawable(Color.GREEN)),
-                new Pair<>(new ColorDrawable(Color.DKGRAY), new ColorDrawable(Color.YELLOW))
-            )
+                Arrays.asList(
+                        new Pair<>(new ColorDrawable(Color.MAGENTA), new ColorDrawable(Color.GREEN)),
+                        new Pair<>(new ColorDrawable(Color.MAGENTA), new ColorDrawable(Color.YELLOW)),
+                        new Pair<>(new ColorDrawable(Color.MAGENTA), new ColorDrawable(Color.RED)),
+                        new Pair<>(new ColorDrawable(Color.MAGENTA), new ColorDrawable(Color.RED))
+                ),
+                Arrays.asList(
+                        new Pair<>(new ColorDrawable(Color.CYAN), new ColorDrawable(Color.GREEN)),
+                        new Pair<>(new ColorDrawable(Color.CYAN), new ColorDrawable(Color.YELLOW)),
+                        new Pair<>(new ColorDrawable(Color.CYAN), new ColorDrawable(Color.YELLOW)),
+                        new Pair<>(new ColorDrawable(Color.CYAN), new ColorDrawable(Color.RED))
+                ),
+                Arrays.asList(
+                        new Pair<>(new ColorDrawable(Color.DKGRAY), new ColorDrawable(Color.GREEN)),
+                        new Pair<>(new ColorDrawable(Color.DKGRAY), new ColorDrawable(Color.GREEN)),
+                        new Pair<>(new ColorDrawable(Color.DKGRAY), new ColorDrawable(Color.GREEN)),
+                        new Pair<>(new ColorDrawable(Color.DKGRAY), new ColorDrawable(Color.YELLOW))
+                )
         );
-
-        // set images
-        LinearLayout imageLayout = findViewById(R.id.images);
-        for (int i = 0; i < mImages.size(); i++) {
-            ColorDrawable drawable = mImages.get(i);
-            ImageView img = new ImageView(this);
-
-            LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(dp2px(100), dp2px(80));
-            if(i > 0)
-                layoutParams.leftMargin = dp2px(8);
-
-            img.setImageDrawable(drawable);
-            img.setLayoutParams(layoutParams);
-
-            imageLayout.addView(img);
-        }
 
         // set rating
         ImageView ratingView = findViewById(R.id.ratingBar);
@@ -131,6 +166,58 @@ public class ViewProductActivity extends AppCompatActivity {
                 }
             }
         });
+
+        // set images
+        mImageLayout = findViewById(R.id.images);
+        setImages();
+    }
+
+    private void setImages() throws JSONException {
+        RequestQueue queue = Volley.newRequestQueue(getBaseContext());
+
+        for (int i = 0; i < mImages.length(); i++) {
+            final int index = i;
+            String id = mImages.getString(i);
+
+            String url = "http://" + getString(R.string.serverIP) + "/image/" + id;
+
+            StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
+                    new Response.Listener<String>() {
+                        @Override
+                        public void onResponse(String response) {
+                            Log.d("productview", "Response is: " + response);
+
+                            showImage(response, index);
+                        }
+                    }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    Log.d("scan", "That didn't work: " + error);
+                }
+            });
+
+            queue.add(stringRequest);
+        }
+    }
+
+    private void showImage(String response, int index)
+    {
+        byte[] data = response.getBytes();
+        Bitmap bmp = BitmapFactory.decodeByteArray(data, 0, data.length);
+
+        ImageView img = new ImageView(this);
+
+        LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.WRAP_CONTENT,
+                LinearLayout.LayoutParams.MATCH_PARENT
+        );
+        if(index > 0)
+            layoutParams.leftMargin = dp2px(8);
+
+        img.setImageBitmap(bmp);
+        img.setLayoutParams(layoutParams);
+
+        mImageLayout.addView(img, layoutParams);
     }
 
     private static int dp2px(int dp) {
