@@ -37,7 +37,6 @@ public class ScanActivity extends AppCompatActivity {
 
                 RequestQueue queue = Volley.newRequestQueue(getBaseContext());
                 String url = "http://" + getString(R.string.serverIP) + "/rating/" + result.getContents() + "/count";
-                Log.d("scan", "url: " + url);
 
                 final Context context = this;
 
@@ -56,7 +55,7 @@ public class ScanActivity extends AppCompatActivity {
                             }
                             else
                             {
-                                // start product view activity
+                                intent = new Intent(context, ViewProductActivity.class);
                             }
 
                             intent.putExtra("EAN", result.getContents());
