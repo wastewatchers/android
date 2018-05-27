@@ -132,6 +132,7 @@ public class AddActivity extends AppCompatActivity {
                 });
 
                 mQueue.add(productRequest);
+                //mQueue.
 
                 String ratingUrl = "http://" + IP + "/rating/" + mEan + "?" +
                         "uid=" + mUuid + "&" +
@@ -190,6 +191,23 @@ public class AddActivity extends AppCompatActivity {
                 }
             }
         });
+
+        String ratingCountUrl = "http://" + IP + "/rating/" + mEan + "/count";
+
+        StringRequest ratingCountRequest = new StringRequest(Request.Method.GET, ratingCountUrl,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        Log.d(TAG, "ratingCount: " + response);
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Log.d(TAG, "That didn't work: " + error);
+            }
+        });
+
+        mQueue.add(ratingCountRequest);
     }
 
     @Override

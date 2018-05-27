@@ -2,7 +2,7 @@
     <string name="app_name">Waste Watchers</string>
     <string-array name="array_recyclable">
         <item>recyclable</item>
-        <item>not recyclable</item>
+        <item>non recyclable</item>
         <item>compostable</item>
     </string-array>
     <string-array name="array_plasticTypes">
